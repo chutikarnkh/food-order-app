@@ -3,42 +3,35 @@ import { useEffect, useState } from 'react';
 import Card from '../UI/Card';
 import MealItem from './MealItem/MealItem';
 import classes from './AvailableMeals.module.css';
+import useHttp from '../../hooks/use-http';
 
 const AvailableMeals = () => {
   const [meals, setMeals] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [httpError, setHttpError] = useState();
+
+  const { isLoading, error, sendRequest: fetchMeals } = useHttp();
 
   useEffect(() => {
-
-    const fetchMeals = async () => {
-      const response = await fetch('https://react-http-9779b-default-rtdb.asia-southeast1.firebasedatabase.app/meals.json');
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error('Something went wrong!');
-      }
-
+    const transformMeal = (mealsObj) => {
       const loadedMeals = [];
 
-      for (const key in responseData) {
+      for (const key in mealsObj) {
         loadedMeals.push({
           id: key,
-          name: responseData[key].name,
-          description: responseData[key].description,
-          price: responseData[key].price
+          name: mealsObj[key].name,
+          description: mealsObj[key].description,
+          price: mealsObj[key].price
         });
       }
       setMeals(loadedMeals);
-      setIsLoading(false);
     };
 
-    fetchMeals().catch((error) => {
-      setIsLoading(false);
-      setHttpError(error.message);
-    });
-
-  }, []);
+    fetchMeals(
+      {
+        url: 'https://react-http-9779b-default-rtdb.asia-southeast1.firebasedatabase.app/meals.json'
+      },
+      transformMeal
+    );
+  }, [fetchMeals]);
 
   if (isLoading) {
     return (
@@ -48,10 +41,10 @@ const AvailableMeals = () => {
     );
   }
 
-  if (httpError) {
+  if (error) {
     return (
       <section className={classes.MealsError}>
-        <p>{httpError}</p>
+        <p>{error}</p>
       </section>
     );
   }

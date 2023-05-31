@@ -4,6 +4,7 @@ import CartItem from './CartItem';
 import classes from './Cart.module.css';
 import CartContext from '../../store/cart-context';
 import Checkout from './Checkout';
+import useHttp from '../../hooks/use-http';
 
 const Cart = (props) => {
   const [isCheckout, setIsCheckout] = useState(false);
@@ -11,8 +12,9 @@ const Cart = (props) => {
   const [didSubmit, setDidSubmit] = useState(false);
 
   const cartCtx = useContext(CartContext);
+  const { error, sendRequest: sendOrder } = useHttp();
 
-  const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
+  const totalAmount = `฿${cartCtx.totalAmount.toFixed(2)}`;
   const hasItems = cartCtx.items.length > 0;
 
   const cartItemRemoveHandler = (id) => {
@@ -29,20 +31,24 @@ const Cart = (props) => {
 
   const submitOrderHandler = async (userData) => {
     setIsSubmitting(true);
-    await fetch('https://react-http-9779b-default-rtdb.asia-southeast1.firebasedatabase.app/order.js', {
+    sendOrder({
+      url: 'https://react-http-9779b-default-rtdb.asia-southeast1.firebasedatabase.app/order.json',
       method: 'POST',
-      body: JSON.stringify({
+      body: {
         user: userData,
         orderedItems: cartCtx.items
-      })
+      }
     });
+
     setIsSubmitting(false);
     setDidSubmit(true);
     cartCtx.clearCart();
   };
 
+  const cartClasses = `${classes['cart-items']} ${isCheckout ? classes['with-checkout'] : ''}`;
+
   const cartItems = (
-    <ul className={classes['cart-items']}>
+    <ul className={cartClasses}>
       {cartCtx.items.map((item) => (
         <CartItem
           key={item.id}
@@ -59,7 +65,6 @@ const Cart = (props) => {
   const modalActions = (
     <div className={classes.actions}>
       <button
-        // className={classes['button--alt']}
         onClick={props.onClose}
       >
         Close
@@ -70,7 +75,7 @@ const Cart = (props) => {
 
 
   const cartModalContent = (
-    <React.Fragment>
+    <div>
       {cartItems}
       <div className={classes.total}>
         <span>Total Amount</span>
@@ -78,13 +83,15 @@ const Cart = (props) => {
       </div>
       {isCheckout && <Checkout onConfirm={submitOrderHandler} onCancel={props.onClose} />}
       {!isCheckout && modalActions}
-    </React.Fragment>
+    </div>
   );
 
   const submittingModalContent = <p>Sending order data...</p>;
   const submittedModalContent = (
     <React.Fragment>
-      <p>Successfully sent the order!</p>
+      <p className={error ? classes.invalid : ''}>
+        {error ? error : 'Successfully sent the order!'}
+      </p>
       <div className={classes.actions}>
         <button
           className={classes.button}

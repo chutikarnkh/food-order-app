@@ -1,6 +1,6 @@
 .form {
-  margin: 1rem 0;
-  height: 19rem;
+  margin: 1.5rem 0 0;
+  height: 12rem;
   overflow: auto;
 }
 
@@ -18,14 +18,16 @@
   font: inherit;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 20rem;
+  width: 100%;
   max-width: 100%;
+  padding: 0.25rem 0.75rem;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 .actions button {
@@ -54,6 +56,11 @@
   background-color: #7a2706;
 }
 
+.actions .submit:disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 .invalid label {
   color: #ca3e51;
 }
@@ -61,4 +68,10 @@
 .invalid input {
   border-color: #aa0b20;
   background-color: #ffeff1;
+}
+
+.invalid p {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #ca3e51;
 }
