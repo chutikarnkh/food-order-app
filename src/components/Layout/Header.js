@@ -2,7 +2,8 @@ import { Fragment } from "react";
 
 import HeaderCartButton from "./HeaderCartButton";
 
-import mealsImage from '../../assets/food-table.jpg';
+import mealsImage from '../../assets/food-table.png';
+import mealsWebp from '../../assets/food-table.webp';
 import classes from './Header.module.css';
 
 const Header = props => {
@@ -13,7 +14,11 @@ const Header = props => {
         <HeaderCartButton onClick={props.onShowCart} />
       </header>
       <div className={classes['main-image']}>
-        <img src={mealsImage} alt="A table full of delicious food!" />
+        <picture>
+          <source srcset={mealsWebp} type="image/webp" />
+          <source srcset={mealsImage} type="image/png" />
+          <img src={mealsImage} alt="A table full of delicious food!" />
+        </picture>
       </div>
     </Fragment>
   );
